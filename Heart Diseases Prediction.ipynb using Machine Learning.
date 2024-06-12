@@ -1,0 +1,466 @@
+# 1. Importing the Libraries
+
+import pandas as pd
+
+# 2. Importing the Dataset
+
+data = pd.read_csv('heart.csv')
+
+# 3. Taking Care of Missing Values
+
+data.isnull().sum()
+
+# 4. Taking Care of Duplicate Values
+
+data_dup = data.duplicated().any()
+
+data_dup
+
+data = data.drop_duplicates()
+
+data_dup = data.duplicated().any()
+
+data_dup
+
+# 5. Data Processing
+
+cate_val = []
+const_val = []
+
+for column in data.columns:
+    if data[column].nunique() <= 10:
+        cate_val.append(column)
+    else:
+        const_val.append(column)
+
+cate_val
+
+const_val
+
+# 6. Encoding Categorical Data
+
+cate_val
+
+data['cp'].unique()
+
+cate_val.remove('sex')
+cate_val.remove('target')
+data = pd.get_dummies(data,columns=cate_val,drop_first=True)
+
+data.head()
+
+# 7. Feature Scaling
+
+data.head()
+
+from sklearn.preprocessing import StandardScaler
+
+st = StandardScaler()
+data[const_val] = st.fit_transform(data[const_val])
+
+data.head()
+
+# 8. Splitting The Dataset Into The Training Set And Test Set
+
+X = data.drop('target',axis=1)
+
+y = data['target']
+
+from sklearn.model_selection import train_test_split
+
+X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=0.2,random_state=42)
+
+y_test
+
+# 9. Logistic Regression
+
+data.head()
+
+from sklearn.linear_model import LogisticRegression
+
+log = LogisticRegression()
+log.fit(X_train,y_train)
+
+y_pred1 = log.predict(X_test)
+
+from sklearn.metrics import accuracy_score
+
+accuracy_score(y_test,y_pred1)
+
+# 10. SCV (Support Vector Classifier)
+
+from sklearn import svm
+
+svm = svm.SVC()
+
+svm.fit(X_train,y_train)
+
+y_pred2 = svm.predict(X_test)
+
+accuracy_score(y_test,y_pred2)
+
+# 11. KNeighbors Classifier
+
+from sklearn.neighbors import KNeighborsClassifier
+
+knn = KNeighborsClassifier()
+
+knn.fit(X_train,y_train)
+
+y_pred3=knn.predict(X_test)
+
+accuracy_score(y_test,y_pred3)
+
+score = []
+
+for k in range(1,40):
+    knn=KNeighborsClassifier(n_neighbors=k)
+    knn.fit(X_train,y_train)
+    y_pred=knn.predict(X_test)
+    score.append(accuracy_score(y_test,y_pred))
+
+score
+
+import matplotlib.pyplot as plt
+
+plt.plot(score)
+plt.xlabel("K Value")
+plt.ylabel("Acc")
+plt.show()
+
+knn=KNeighborsClassifier(n_neighbors=2)
+knn.fit(X_train,y_train)
+y_pred=knn.predict(X_test)
+accuracy_score(y_test,y_pred)
+
+# Non Linear Machine Learning Algorithm
+
+data = pd.read_csv('heart.csv')
+
+data.head()
+
+data = data.drop_duplicates()
+
+data.shape
+
+X = data.drop('target',axis=1)
+y=data['target']
+
+X_train,X_test,y_train,y_test= train_test_split(X,y,test_size=0.2,random_state=42)
+
+# 12. Decision Tree Classifier
+
+from sklearn.tree import DecisionTreeClassifier
+
+dt = DecisionTreeClassifier()
+
+dt.fit(X_train,y_train)
+
+y_pred4 = dt.predict(X_test)
+
+accuracy_score(y_test,y_pred4)
+
+# 13. Random Forest Classifier
+
+from sklearn.ensemble import RandomForestClassifier
+
+rf = RandomForestClassifier()
+
+rf.fit(X_train,y_train)
+
+y_pred5 = rf.predict(X_test)
+
+accuracy_score(y_test,y_pred5)
+
+# 14. Gradient Boosting Classifier
+
+from sklearn.ensemble import GradientBoostingClassifier
+
+gbc = GradientBoostingClassifier()
+
+gbc.fit(X_train,y_train)
+
+y_pred6 = gbc.predict(X_test)
+
+accuracy_score(y_test,y_pred6)
+
+
+final_data = pd.DataFrame({'Models':['LR','SVM','DT','RF','GB'],
+                          'ACC':[accuracy_score(y_test,y_pred1)*100,
+                                accuracy_score(y_test,y_pred2)*100,
+                                accuracy_score(y_test,y_pred4)*100,
+                                accuracy_score(y_test,y_pred5)*100,
+                                accuracy_score(y_test,y_pred6)*100]})
+
+final_data
+
+import seaborn as sns
+
+import matplotlib.pyplot as plt  # Importing matplotlib for displaying the plot
+
+# Assuming final_data is a DataFrame containing 'Models' and 'ACC' columns
+sns.barplot(x='Models', y='ACC', data=final_data)
+plt.show()  # Display the plot
+
+X=data.drop('target',axis=1)
+y=data['target']
+
+from sklearn.ensemble import RandomForestClassifier
+
+rf = RandomForestClassifier()
+rf.fit(X,y)
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load the dataset
+file_path = 'heart.csv'
+heart_data = pd.read_csv(file_path)
+
+# Display the first few rows of the dataset
+print(heart_data.head())
+
+# 15. Histogram For Each Target Values
+
+# Separate data based on target variable
+heart_disease = heart_data[heart_data['target'] == 1]
+no_heart_disease = heart_data[heart_data['target'] == 0]
+
+# Define a function to plot histograms for each attribute
+def plot_histogram(attribute_name):
+    plt.figure(figsize=(10, 6))
+    plt.hist(heart_disease[attribute_name], bins=20, alpha=0.5, color='blue', label='Heart Disease')
+    plt.hist(no_heart_disease[attribute_name], bins=20, alpha=0.5, color='green', label='No Heart Disease')
+    plt.xlabel(attribute_name)
+    plt.ylabel('Frequency')
+    plt.legend()
+    plt.title(f'Histogram of {attribute_name} for Heart Disease vs. No Heart Disease')
+    plt.show()
+
+# Plot histograms for each attribute
+attributes_to_analyze = ['age', 'sex', 'cp', 'trestbps', 'chol', 'fbs', 'restecg', 'thalach', 'exang', 'oldpeak', 'slope', 'ca', 'thal']
+for attribute in attributes_to_analyze:
+    plot_histogram(attribute)
+
+# 16. Confusion Matrix
+
+# Confusion Matrix
+from sklearn.metrics import accuracy_score, confusion_matrix  
+y_test_pred = rf.predict(X_test)
+conf_matrix = confusion_matrix(y_test, y_test_pred)
+print('Confusion Matrix:')
+print(conf_matrix)
+
+# Plotting the confusion matrix
+sns.heatmap(conf_matrix, annot=True, fmt="d", cmap="YlGnBu", xticklabels=['No Disease', 'Disease'], yticklabels=['No Disease', 'Disease'])
+plt.xlabel('Predicted')
+plt.ylabel('Actual')
+plt.title('Confusion Matrix')
+plt.show()
+
+# 17. Training And Execution Time of Each Models
+
+# Import necessary libraries
+import time
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix
+from sklearn.ensemble import RandomForestClassifier
+# Other necessary imports for your project
+
+# Data preparation
+# Assuming X and y are your dataset
+
+# Train and evaluate model 1
+# Measure training time
+start_train_model1 = time.time()
+# Train model 1
+# Evaluation code
+end_train_model1 = time.time()
+train_time_model1 = end_train_model1 - start_train_model1
+
+# Measure execution time
+start_exec_model1 = time.time()
+# Predictions using model 1
+end_exec_model1 = time.time()
+exec_time_model1 = end_exec_model1 - start_exec_model1
+
+# Print results for model 1
+print("Model 1 Training Time:", train_time_model1)
+print("Model 1 Execution Time:", exec_time_model1)
+# Confusion matrix for model 1
+
+# Train and evaluate model 2
+# Measure training time
+start_train_model2 = time.time()
+# Train model 2
+# Evaluation code
+end_train_model2 = time.time()
+train_time_model2 = end_train_model2 - start_train_model2
+
+# Measure execution time
+start_exec_model2 = time.time()
+# Predictions using model 2
+end_exec_model2 = time.time()
+exec_time_model2 = end_exec_model2 - start_exec_model2
+
+# Print results for model 2
+print("Model 2 Training Time:", train_time_model2)
+print("Model 2 Execution Time:", exec_time_model2)
+
+import matplotlib.pyplot as plt
+
+# Lists to store training and execution times for each model
+model_names = ["Model 1", "Model 2"]
+train_times = [train_time_model1, train_time_model2]
+exec_times = [exec_time_model1, exec_time_model2]
+
+# Plotting
+plt.figure(figsize=(10, 5))
+
+# Plot training times
+plt.plot(model_names, train_times, marker='o', label='Training Time')
+
+# Plot execution times
+plt.plot(model_names, exec_times, marker='o', label='Execution Time')
+
+# Add labels and title
+plt.xlabel('Models')
+plt.ylabel('Time (seconds)')
+plt.title('Training and Execution Time for Each Model')
+plt.legend()
+
+# Show plot
+plt.grid(True)
+plt.show()
+
+# 18 .Prediction on New Data
+
+import pandas as pd
+
+new_data = pd.DataFrame ({
+    'age' :52,
+    'sex' :1,
+    'cp' :0,
+    'trestbps' :125,
+    'chol' :212,
+    'fbs' :0,
+    'restecg' :1,
+    'thalach' :168,
+    'exang' :0,
+    'oldpeak' :1.0,
+    'slope' :2,
+    'ca' :2,
+    'thal' :3, 
+},index=[0])
+
+new_data
+
+p = rf.predict(new_data)
+if p[0] == 0:
+    print("No Disease")
+else:
+    print("Disease") 
+
+# 19. Save Model Using Joblib
+
+import joblib
+
+joblib.dump(rf, 'model_joblib_heart')
+
+model = joblib.load ('model_joblib_heart')
+
+model.predict(new_data)
+
+data.tail()
+
+# 20. Graphical User Interface (GUI)
+
+from tkinter import *
+from tkinter import messagebox, ttk
+import joblib
+import numpy as np
+from sklearn import *
+
+def show_entry_fields():
+    try:
+        p1 = int(e1.get())
+        p2 = int(e2.get())
+        p3 = int(e3.get())
+        p4 = int(e4.get())
+        p5 = int(e5.get())
+        p6 = int(e6.get())
+        p7 = int(e7.get())
+        p8 = int(e8.get())
+        p9 = int(e9.get())
+        p10 = float(e10.get())
+        p11 = int(e11.get())
+        p12 = int(e12.get())
+        p13 = int(e13.get())
+        
+        model = joblib.load('model_joblib_heart')
+        result = model.predict([[p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13]])
+        
+        result_text = "No Heart Disease" if result == 0 else "Possibility of Heart Disease"
+        messagebox.showinfo("Prediction Result", result_text)
+    except Exception as e:
+        messagebox.showerror("Input Error", f"Invalid input or model error: {str(e)}")
+
+master = Tk()
+master.title("Heart Disease Prediction System")
+master.geometry("700x900")
+
+style = ttk.Style(master)
+style.configure("TLabel", font=("Helvetica", 14))
+style.configure("TButton", font=("Helvetica", 16))
+
+# Title label
+title_label = Label(master, text="Heart Disease Prediction System", bg="black", fg="white", font=("Helvetica", 18), pady=10)
+title_label.pack(fill=X)
+
+main_frame = Frame(master, padx=20, pady=20)
+main_frame.pack(padx=10, pady=10)
+
+# Input labels and entries
+labels = [
+    "Enter Your Age", "Male Or Female [1/0]", "Enter Value of CP", 
+    "Enter Value of Trestbps", "Enter Value of Chol", "Enter Value of Fbs", 
+    "Enter Value of Restecg", "Enter Value of Thalach", "Enter Value of Exang", 
+    "Enter Value of Oldpeak", "Enter Value of Slope", "Enter Value of CA", 
+    "Enter Value of Thal"
+]
+
+entries = []
+for i, label in enumerate(labels):
+    row = Frame(main_frame)
+    row.pack(fill=X, pady=5)
+    lbl = ttk.Label(row, text=label, width=25, anchor=E)
+    lbl.pack(side=LEFT)
+    entry = ttk.Entry(row, width=30, font=("Helvetica", 14))
+    entry.pack(side=LEFT, padx=10)
+    entries.append(entry)
+
+e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13 = entries
+
+# Predict button
+predict_button = ttk.Button(main_frame, text='Predict', command=show_entry_fields)
+predict_button.pack(pady=20)
+
+# Result label
+result_label = Label(main_frame, text="", font=("Helvetica", 16))
+result_label.pack(pady=10)
+
+mainloop()
+
+
+
+
+
+
+
+
+
+
+
+
